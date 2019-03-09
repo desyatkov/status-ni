@@ -1,0 +1,212 @@
+body {
+ padding-bottom: 40px;
+
+}
+
+.unknown:before,
+.unset::before,
+.major::before,
+.minor::before,
+.maintenance::before {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  font-family: "Font Awesome 5 Free";
+}
+
+.jsgrid-cell {
+    padding-left: 10px;
+} 
+
+.unknown:before,
+.unset:before {
+  content: '';
+  color: #767676;
+}
+
+.maintenance::before {
+  content: '';
+  color: green;
+}
+
+.major:before {
+  content: '';
+  color: #e0475e;
+}
+
+.minor:before {
+  content: '';
+  color: #4da5e0;
+}
+
+.jsgrid-header-row {
+  height: 60px;
+  background-image: linear-gradient(225deg, #ec008c 0%, #ff0000 51%, #ffc20e 100%);
+}
+
+.jsgrid-header-row .jsgrid-header-cell {
+  color: #fff;
+}
+
+.jsgrid-header-sortable {
+  position: relative;
+}
+
+/*.jsgrid-header-sort-asc,*/
+/*.jsgrid-header-sort-desc */
+
+.jsgrid-header-sortable:before {
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  font-family: "Font Awesome 5 Free";
+}
+
+th:first-child.jsgrid-header-sortable:before {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  content: '';
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+
+
+th:first-child.jsgrid-header-sortable.jsgrid-header-sort-asc:before {
+  transform: rotate(180deg);
+}
+
+.jsgrid-alt-row {
+  background-color: #f3f3f3;
+}
+
+.jsgrid-row, .jsgrid-alt-row {
+  height: 54px;
+}
+
+.jsgrid-cell > div {
+  text-align: center;
+}
+
+table, tr {
+  border-collapse: collapse;
+}
+
+.jsgrid-table {
+   margin: auto;
+}
+
+
+.status-table {
+  width: 1050px;
+  margin: 0 auto 20px;
+}
+
+.status-table, .status__legenda {
+  display: flex;
+}
+
+.status__legenda {
+  margin-left: auto;
+}
+
+.fas {
+  margin-left: 10px;
+}
+
+header {
+  background-image: url("http://boost-assets-production.s3-website-us-east-1.amazonaws.com/assets/general/9633/back.png");
+      height: 122px;
+    background-size: cover;
+    background-repeat: no-repeat;
+      display: flex;
+    align-items: center;
+    
+}
+
+.header_wrap {
+position: relative;
+}
+
+.header_wrap:before {
+		   content: "";
+   width: 48px;
+   height: 48px;
+  display: block;
+  position: absolute;
+  background-image: url("http://boost-assets-production.s3-website-us-east-1.amazonaws.com/assets/general/9632/Fill_4_Copy.png");
+  left: -90px;
+  top: 0;
+}
+
+.header_wrap {
+  width	: 1050px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.header_ttl {
+color: #ffffff;
+  font-size: 50px;
+  font-weight: 400;
+  letter-spacing: 2.84px;
+  display: flex;
+  align-items: center;
+}
+
+header .support {
+  margin-left: auto;
+  width: 214px;
+  height: 49px;
+  border-radius: 30px;
+  border: 1px solid #ffffff;
+}
+
+header .support a {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 1.14px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div#jsGrid {
+   height: 980px !important;
+}
+
+.history_page {
+  width: 1050px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.history_page_btn {
+  width: 214px;
+  height: 49px;
+  border-radius: 30px;
+  background-color: #fe2824;
+}
+
+.history_page_btn a {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 1.14px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

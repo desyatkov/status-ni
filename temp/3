@@ -1,0 +1,226 @@
+<script>
+ $('.container').html('');
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
+<div class="status-table">
+    <div class="status__title">Update Info</div>
+    <div class="status__legenda">
+        <div><i class="fas fa-check-circle"></i> Maintenace</div>
+        <div><i class="fas fa-wrench"></i> Major</div>
+        <div><i class="fas fa-exclamation-circle"></i> Minor</div>
+    </div>
+</div>
+
+<div id="jsGrid"></div>
+
+
+
+<script>
+
+    $.get('index.json', function (data) {
+        gloabalData = data
+        /*BEGIN*/
+
+        var DAYS = 5;
+        var StatusField = function (config) {
+            jsGrid.Field.call(this, config);
+        };
+
+        StatusField.prototype = new jsGrid.Field({
+
+            css: "date-field", // redefine general property 'css'
+            align: "center", // redefine general property 'align'
+
+            myCustomProperty: "foo", // custom property
+
+            sorter: function (date1, date2) {
+                return new Date(date1) - new Date(date2);
+            },
+
+            itemTemplate: function (value) {
+                var res = $('<div>', {
+                    class: value.state.toString() + " " + value.idInc.toString(),
+                    alt: "Smiley face"
+                });
+                return res;
+
+            },
+
+            insertTemplate: function (value) {
+                return this._insertPicker = $("<input>").datepicker({
+                    defaultDate: new Date()
+                });
+            },
+
+            editTemplate: function (value) {
+                return this._editPicker = $("<input>").datepicker().datepicker("setDate", new Date(value));
+            },
+
+            insertValue: function () {
+                return this._insertPicker.datepicker("getDate").toISOString();
+            },
+
+            editValue: function () {
+                return this._editPicker.datepicker("getDate").toISOString();
+            }
+        });
+
+
+        // create array of relevant dates
+        function getRelevantDaysArr(daysBack) {
+            var d_now = new Date();
+            var begin_date = new Date();
+            begin_date.setDate(begin_date.getDate() - daysBack);
+            var dates = getDateArray(begin_date, d_now);
+            return dates;
+        }
+
+        var getDateArray = function (start, end) {
+            var arr = new Array();
+            var dt = new Date(start);
+            while (dt <= end) {
+                arr.push(new Date(dt));
+                dt.setDate(dt.getDate() + 1);
+            }
+            return arr;
+        }
+
+        // foreach component extract list of incidents
+        dateRange = getRelevantDaysArr(DAYS);
+        enrichedComponents = [];
+        data.components.forEach(function (component) {
+            var comp = {
+                name: component.name,
+                id: component.id
+            };
+
+            dateRange.forEach(function (d, index) {
+                comp["date_" + index] = {
+                    date: d,
+                    id: index,
+                    state: 'unset',
+                    idInc: '0'
+                };
+            });
+            enrichedComponents.push(comp)
+        });
+
+
+        function isIncidentRelevantToDateRange(incident, dateRange) {
+            var diffDates = new Date(incident.resolved_at).getTime() - new Date(dateRange[0]).getTime();
+            if (diffDates >= 0) {
+                return true;
+            }
+            return false;
+        }
+
+
+        incidentByComponent = {};
+        data.incidents.forEach(function (incident) {
+            incident.components.forEach(function (component) {
+                if (isIncidentRelevantToDateRange(incident, dateRange)) {
+                    var byComponent = incidentByComponent[component.group_id];
+                    if (!byComponent) {
+                        byComponent = {
+                            max: null,
+                            min: null
+                        };
+                    }
+                    if (!byComponent.max || new Date(incident.resolved_at).getTime() > new Date(byComponent.max.resolved_at).getTime()) {
+                        byComponent.max = incident;
+                    }
+                    if (!byComponent.min || new Date(incident.resolved_at).getTime() < new Date(byComponent.min.resolved_at).getTime()) {
+                        byComponent.min = incident;
+                    }
+
+                    incidentByComponent[component.group_id] = byComponent;
+                }
+            });
+        });
+
+
+
+        enrichedComponents.forEach(function (comp) {
+            var byComp = incidentByComponent[comp.id] && incidentByComponent[comp.id];
+            console.log(byComp);
+            for (var i = 0; i < DAYS; i++) {
+
+                var compDate = new Date(comp['date_' + i].date).getTime();
+
+                comp['date_' + i].state = 'unset';
+
+
+                if (byComp) {
+                    var maxDate = new Date(byComp.max.resolved_at).getTime();
+                    var minDate = new Date(byComp.min.created_at).getTime();
+                    //found an incident in range
+                    // if (compDate <= maxDate && compDate >= minDate) {
+                    //     comp['date_' + i].state = 'bad';
+                    // }
+
+                    comp['date_' + i].idInc = byComp.max.id;
+                    comp['date_' + i].state = byComp.max.impact;
+                }
+            }
+        });
+
+        gridFields = [{
+            title: "Id",
+            name: "id",
+            type: "text",
+            width: 50,
+            visible: false,
+            validate: "required"
+        }, {
+            title: "Service",
+            name: "name",
+            type: "text",
+            width: 150,
+            validate: "required"
+        }];
+
+        function initGridFields() {
+
+            dateRange.forEach(function (day, index) {
+                var f = {
+                    title: day.getDate() + '/' + (day.getMonth() + 1),
+                    name: "date_" + (index),
+                    type: "status",
+                    width: 150,
+                    validate: "required"
+                };
+                gridFields.push(f);
+            });
+
+        }
+
+        initGridFields();
+
+        jsGrid.fields.status = StatusField;
+
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "800px",
+
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+
+            data: enrichedComponents,
+
+            fields: gridFields
+        });
+    });
+
+
+
+</script>
+
+
+<div class="history_page">
+  <div class="history_page_btn">
+    <a href="/">History page <i class="fas fa-long-arrow-alt-right"></i></a>
+  </div>
+</div>
